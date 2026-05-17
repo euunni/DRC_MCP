@@ -50,7 +50,6 @@ do
 
         echo "/DRsim/action/useHepMC False" >> 1run_$macroname.mac
         echo "/DRsim/action/useCalib True" >> 1run_$macroname.mac
-        echo "/vis/disable" >> 1run_$macroname.mac
         echo "/run/numberOfThreads 1" >> 1run_$macroname.mac
         echo "/run/initialize" >>1run_$macroname.mac
         echo "/run/verbose 1" >> 1run_$macroname.mac

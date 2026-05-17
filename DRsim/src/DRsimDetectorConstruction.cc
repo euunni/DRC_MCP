@@ -75,6 +75,8 @@ DRsimDetectorConstruction::DRsimDetectorConstruction()
   filterT = 0.01*mm;
   reflectorT = 0.03*mm;
 
+  fVisAttrWhite = new G4VisAttributes(G4Colour(1.0,1.0,1.0,1.0));
+  fVisAttrWhite->SetVisibility(true);
   fVisAttrOrange = new G4VisAttributes(G4Colour(1.0,0.5,0.,1.0));
   fVisAttrOrange->SetVisibility(true);
   fVisAttrBlue = new G4VisAttributes(G4Colour(0.,0.,1.0,1.0));
@@ -189,13 +191,23 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
       new G4PVPlacement(0,dimCalc->GetOrigin_PMTG(i),PMTGLogical_[i],moduleName,worldLogical,false,0,checkOverlaps);
     }
 
-    FiberImplement(i,ModuleLogical_,fiberUnitIntersection_,fiberCladIntersection_,fiberCoreIntersection_,AirGapIntersection_);
+    int row = i / fNofRow;
+    int col = i % fNofRow;
+
+    // Last column of the orange (central 8x8) region: reduce fiber columns from 4 to 3
+    G4int nFiber = (row >= 8 && row < 16 && col == 15) ? 3 : -1;
+    FiberImplement(i,ModuleLogical_,fiberUnitIntersection_,fiberCladIntersection_,fiberCoreIntersection_,AirGapIntersection_,nFiber);
 
     DRsimInterface::DRsimModuleProperty ModulePropSingle;
     ModulePropSingle.towerXY   = fTowerXY;
     ModulePropSingle.ModuleNum = i;
     ModuleProp_.push_back(ModulePropSingle);
-    ModuleLogical_[i]->SetVisAttributes(fVisAttrOrange);
+
+    if (row >= 8 && row < 16 && col >= 8 && col < 16) {
+      ModuleLogical_[i]->SetVisAttributes(fVisAttrOrange);
+    } else {
+      ModuleLogical_[i]->SetVisAttributes(fVisAttrWhite);
+    }
 
     if ( doPMT ) {
       G4VSolid* SiPMlayerSolid = new G4Box("SiPMlayerSolid", (fModuleH/2.) *mm, (fModuleW/2.) *mm, (PMTT/2.) *mm );
@@ -236,9 +248,10 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
 
 void DRsimDetectorConstruction::DefineCommands() {}
 
-void DRsimDetectorConstruction::FiberImplement(G4int i, G4LogicalVolume* ModuleLogical__[], 
-                                              std::vector<G4LogicalVolume*> fiberUnitIntersection__[], std::vector<G4LogicalVolume*> fiberCladIntersection__[], 
-                                              std::vector<G4LogicalVolume*> fiberCoreIntersection__[], std::vector<G4LogicalVolume*> AirGapIntersection__[]) {
+void DRsimDetectorConstruction::FiberImplement(G4int i, G4LogicalVolume* ModuleLogical__[],
+                                              std::vector<G4LogicalVolume*> fiberUnitIntersection__[], std::vector<G4LogicalVolume*> fiberCladIntersection__[],
+                                              std::vector<G4LogicalVolume*> fiberCoreIntersection__[], std::vector<G4LogicalVolume*> AirGapIntersection__[],
+                                              G4int nFiber) {
 
   fFiberX.clear();
   fFiberY.clear();
@@ -247,8 +260,8 @@ void DRsimDetectorConstruction::FiberImplement(G4int i, G4LogicalVolume* ModuleL
   int NofFiber;
   int NofPlate;
 
-  NofFiber = fModuleW*2/3;   
-  NofPlate = fModuleH*2/3; 
+  NofFiber = (nFiber > 0) ? nFiber : (int)(fModuleW*2/3);
+  NofPlate = fModuleH*2/3;
 
   fTowerXY = std::make_pair(NofPlate,NofFiber);
   

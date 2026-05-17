@@ -50,9 +50,10 @@ private:
                     std::vector<G4LogicalVolume*> AirGapIntersection_[], 
                     std::vector<DRsimInterface::DRsimModuleProperty>& towerProps_);
 
-  void FiberImplement(G4int i, G4LogicalVolume* ModuleLogical__[], 
+  void FiberImplement(G4int i, G4LogicalVolume* ModuleLogical__[],
                    std::vector<G4LogicalVolume*> fiberUnitIntersection__[], std::vector<G4LogicalVolume*> fiberCladIntersection__[], std::vector<G4LogicalVolume*> fiberCoreIntersection__[],
-                   std::vector<G4LogicalVolume*> AirGapIntersection__[]);
+                   std::vector<G4LogicalVolume*> AirGapIntersection__[],
+                   G4int nFiber = -1);
 
   G4bool checkOverlaps;
   G4GenericMessenger* fMessenger;
@@ -61,6 +62,7 @@ private:
   static G4ThreadLocal DRsimMagneticField* fMagneticField;
   static G4ThreadLocal G4FieldManager* fFieldMgr;
 
+  G4VisAttributes* fVisAttrWhite;
   G4VisAttributes* fVisAttrOrange;
   G4VisAttributes* fVisAttrOrange_PMT;
   G4VisAttributes* fVisAttrBlue;

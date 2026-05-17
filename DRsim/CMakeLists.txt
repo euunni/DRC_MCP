@@ -9,9 +9,9 @@ project(DRsim)
 #
 option(WITH_GEANT4_UIVIS "Build example with Geant4 UI and Vis drivers" OFF)
 if(WITH_GEANT4_UIVIS)
-  find_package(Geant4 REQUIRED ui_all vis_all)
+  find_package(Geant4 CONFIG REQUIRED ui_all vis_all)
 else()
-  find_package(Geant4 REQUIRED)
+  find_package(Geant4 CONFIG REQUIRED)
 endif()
 
 #----------------------------------------------------------------------------
